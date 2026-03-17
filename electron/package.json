@@ -2,32 +2,46 @@
   "name": "meshlink",
   "version": "1.0.0",
   "description": "Offline Bluetooth Mesh Network",
+  "author": "Aditya Singla",
   "main": "main.js",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adityaworkspace1706-star/meshlink.git"
+  },
+
   "scripts": {
     "start": "electron .",
     "dev": "NODE_ENV=development electron .",
-    "build-win": "electron-builder --win --x64",
-    "build-mac": "electron-builder --mac",
-    "build-linux": "electron-builder --linux"
+    "build-win": "electron-builder --win --x64 --publish=never",
+    "build-mac": "electron-builder --mac --publish=never",
+    "build-linux": "electron-builder --linux --publish=never"
   },
+
   "dependencies": {
     "ws": "^8.14.2",
     "@abandonware/noble": "^1.9.2-15"
   },
+
   "devDependencies": {
     "electron": "^27.0.0",
     "electron-builder": "^24.6.4"
   },
+
   "build": {
     "appId": "com.meshlink.app",
     "productName": "MeshLink",
     "icon": "icon.png",
+
+    "publish": null,
+
     "files": [
       "main.js",
       "preload.js",
       "renderer/**/*",
       "icon.png"
     ],
+
     "win": {
       "target": [
         {
@@ -40,13 +54,16 @@
         }
       ]
     },
+
     "mac": {
       "target": "dmg",
       "category": "public.app-category.utilities"
     },
+
     "linux": {
       "target": ["AppImage", "deb"]
     },
+
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
