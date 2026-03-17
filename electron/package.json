@@ -67,8 +67,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "icon.ico",
-      "installerHeaderIcon": "icon.ico",
+      
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     }
