@@ -23,16 +23,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Build APK
+      - name: Build APK (using gradlew)
         run: |
           cd android
-          gradle assembleDebug \
-            -p . \
-            --no-daemon \
-            --stacktrace
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Rename APK
         run: |
@@ -57,10 +52,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install & Build
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies & Build
         run: |
           cd electron
-          npm install
+          npm install --force
           npx electron-builder --win --x64 --publish=never
         shell: bash
 
