@@ -26,7 +26,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build APK (using gradle directly, no wrapper)
+      - name: Build APK
         run: |
           cd android
           gradle assembleDebug \
@@ -61,10 +61,8 @@ jobs:
         run: |
           cd electron
           npm install
-          npm run build-win
+          npx electron-builder --win --x64 --publish=never
         shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
@@ -88,9 +86,7 @@ jobs:
         run: |
           cd electron
           npm install
-          npm run build-mac
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npx electron-builder --mac --publish=never
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
@@ -118,31 +114,9 @@ jobs:
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: MeshLink v1.0.${{ github.run_number }}
-          body: |
-            # 📡 MeshLink — Offline Bluetooth Mesh Network
-
-            ## Download & Install
-
-            | Platform | Download | Steps |
-            |----------|----------|-------|
-            | 📱 **Android** | `MeshLink-Android.apk` | Download → open on phone → Install |
-            | 🪟 **Windows** | `MeshLink-Setup.exe` | Download → run installer |
-            | 🍎 **Mac** | `MeshLink.dmg` | Download → drag to Applications |
-
-            ## Features
-            - 🔵 Auto-discovers nearby devices via **Bluetooth BLE** — no pairing needed
-            - 📶 Also works via **WiFi LAN** as fallback
-            - 🔐 **AES-256-GCM** end-to-end encrypted messages
-            - 📡 **Store-carry-forward** — messages delivered when device reconnects
-            - ⚡ Zero internet · Zero server · Zero account
-
-            ## Android Install Note
-            > Settings → Security → **Allow install from unknown sources** → then open APK
           files: |
             dist/MeshLink-Android/MeshLink-Android.apk
             dist/MeshLink-Windows/MeshLink*.exe
             dist/MeshLink-Mac/MeshLink*.dmg
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
