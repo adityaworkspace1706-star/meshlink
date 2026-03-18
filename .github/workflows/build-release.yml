@@ -1,99 +1,86 @@
 name: Build & Release MeshLink
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 jobs:
-
   # ── BUILD ANDROID APK ──────────────────
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Build APK (using gradlew)
+      - name: Download Gradle Wrapper JAR
+        run: |
+          mkdir -p android/gradle/wrapper
+          curl -L "https://github.com/gradle/gradle/raw/v8.0.0/gradle/wrapper/gradle-wrapper.jar" \
+            -o android/gradle/wrapper/gradle-wrapper.jar
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
-
       - name: Rename APK
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk \
              MeshLink-Android.apk
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: MeshLink-Android
           path: MeshLink-Android.apk
-
   # ── BUILD WINDOWS EXE ──────────────────
   build-windows:
     name: Build Windows EXE
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies & Build
         run: |
           cd electron
           npm install --force
           npx electron-builder --win --x64 --publish=never
         shell: bash
-
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: MeshLink-Windows
           path: electron/dist/MeshLink*.exe
-
   # ── BUILD MAC ──────────────────────────
   build-mac:
     name: Build Mac DMG
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install & Build
         run: |
           cd electron
           npm install
           npx electron-builder --mac --publish=never
-
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: MeshLink-Mac
           path: electron/dist/MeshLink*.dmg
-
   # ── CREATE RELEASE ─────────────────────
   release:
     name: Create GitHub Release
@@ -103,12 +90,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist
-
       - name: Create Release with Downloads
         uses: softprops/action-gh-release@v2
         with:
